@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\DiscordController;
 use Illuminate\Support\Facades\Route;
+use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +16,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 });
+
+/** Discord auth routes */
+Route::get('auth/discord/callback', [DiscordController::class, 'handleProviderCallback']);
+Route::get('auth/discord', [DiscordController::class, 'redirectToProvider']);
+
+/** Logs viewer route */
+Route::get('000-logs', [LogViewerController::class, 'index']);

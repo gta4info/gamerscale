@@ -2,7 +2,8 @@
 
 namespace App\Http\Enums;
 
-enum UserBalanceTypeEnum
+enum UserBalanceTypeEnum: int
 {
-
+    case FIAT = 0;
+    case VBUCKS = 1;
 }

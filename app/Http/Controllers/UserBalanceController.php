@@ -12,33 +12,11 @@ class UserBalanceController extends Controller
 {
     public function store(Request $request): JsonResponse
     {
-        $discordId = $request->post('discordId');
+        $user = (new UserController())->firstOrCreate($request);
 
         try {
-            $user = User::firstOrCreate(
-                [
-                    'oauth_type' => 'discord',
-                    'oauth_id' => $discordId
-                ],
-                [
-                    'oauth_id' => $discordId,
-                    'oauth_type' => 'discord',
-                    'password' => encrypt($discordId)
-                ]
-            );
-
-            if(!$user) {
-                Log::error(json_encode([
-                    "Can't find or create user with discord id = $discordId"
-                ]));
-                return response()->json([
-                    'message' => 'User not found',
-                    'status' => 404
-                ], 404);
-            }
-
             /** Check and update fiat */
-            $lastFiatAmount = $this->findUserLastBalanceRecordByType($user, UserBalanceTypeEnum::FIAT->value);
+            $lastFiatAmount = $this->getCurrentBalanceByType($user, UserBalanceTypeEnum::FIAT->value);
             $fiatAmount = (float)$request->post('fiat');
 
             if($fiatAmount != $lastFiatAmount) {
@@ -49,7 +27,7 @@ class UserBalanceController extends Controller
             }
 
             /** Check and update VBucks */
-            $lastVbucksAmount = $this->findUserLastBalanceRecordByType($user, UserBalanceTypeEnum::VBUCKS->value);
+            $lastVbucksAmount = $this->getCurrentBalanceByType($user, UserBalanceTypeEnum::VBUCKS->value);
             $vbucksAmount = (float)$request->post('vbucks');
 
             if($vbucksAmount != $lastVbucksAmount) {
@@ -72,11 +50,11 @@ class UserBalanceController extends Controller
         }
     }
 
-    public function findUserLastBalanceRecordByType(User $user, int $type): float|null
+    public function getCurrentBalanceByType(User $user, int $type): float
     {
         return (float)$user->balance()
             ->where('type', '=', $type)
-            ->latest()
-            ->value('amount') ?? null;
+            ->latest('id')
+            ->value('amount') ?? 0;
     }
 }

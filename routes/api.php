@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RaffleController;
 use App\Http\Controllers\UserBalanceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,4 +20,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('store-balances', [UserBalanceController::class, 'store']);
+Route::post('user/store-balances', [UserBalanceController::class, 'store']);
+
+Route::prefix('raffles')->controller(RaffleController::class)->group(function () {
+    Route::post('create', 'create');
+    Route::post('update/{raffle}', 'update');
+    Route::post('participate/{raffle}', 'participate');
+    Route::get('user-summaries/{raffle}', 'getUserSummaries');
+});

@@ -2,20 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\UserDiscordConfirmedEnum;
 use App\Models\User;
 use Exception;
-use Firebase\JWT\ExpiredException;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\View\View;
 use Laravel\Socialite\Facades\Socialite;
 
 class DiscordController extends Controller
@@ -23,7 +14,6 @@ class DiscordController extends Controller
     /**
      * Redirect the user to the Discord authentication page.
      *
-     * @param string|null $token
      * @return RedirectResponse
      */
     public function redirectToProvider(): RedirectResponse

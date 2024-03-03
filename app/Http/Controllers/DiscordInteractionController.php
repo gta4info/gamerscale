@@ -21,10 +21,7 @@ class DiscordInteractionController
 
     public function handleDiscordInteraction(Request $request)
     {
-        Log::info('interaction');
-        Log::debug($request);
         $response = $this->interactionService->handleInteractionRequest($request);
-        Log::debug(json_encode($response));
         return response()->json($response->toArray(), $response->getStatus());
     }
 }

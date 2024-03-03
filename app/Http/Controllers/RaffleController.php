@@ -15,8 +15,6 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
 use Nwilging\LaravelDiscordBot\Contracts\Services\DiscordApplicationCommandServiceContract;
-use Nwilging\LaravelDiscordBot\Support\Commands\Options\ChannelOption;
-use Nwilging\LaravelDiscordBot\Support\Commands\Options\StringOption;
 use Nwilging\LaravelDiscordBot\Support\Commands\SlashCommand;
 use Symfony\Component\HttpFoundation\Response;
 

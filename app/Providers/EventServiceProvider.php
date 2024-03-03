@@ -2,12 +2,10 @@
 
 namespace App\Providers;
 
-use App\Events\MessageComponentInteractionListener;
-use App\Notifications\Raffle\RaffleCreateNotification;
+use App\Listeners\MessageComponentInteractionListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 use Nwilging\LaravelDiscordBot\Events\ApplicationCommandInteractionEvent;
 use SocialiteProviders\Discord\DiscordExtendSocialite;
 use SocialiteProviders\Manager\SocialiteWasCalled;

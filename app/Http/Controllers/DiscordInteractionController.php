@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Nwilging\LaravelDiscordBot\Contracts\Services\DiscordInteractionServiceContract;
 
 class DiscordInteractionController
@@ -17,6 +18,7 @@ class DiscordInteractionController
     public function handleDiscordInteraction(Request $request)
     {
         $response = $this->interactionService->handleInteractionRequest($request);
+        Log::debug($request);
         return response()->json($response->toArray(), $response->getStatus());
     }
 }

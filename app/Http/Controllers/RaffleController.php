@@ -28,9 +28,10 @@ class RaffleController extends Controller
 
     public function handleDiscordInteraction(Request $request)
     {
+        Log::info(json_encode($request->all()));
+
         $response = $this->interactionService->handleInteractionRequest($request);
 
-        Log::info(json_encode($request->all()));
         Log::info(json_encode($response));
 
         return response()->json($response->toArray(), $response->getStatus());

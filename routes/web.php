@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DiscordController;
+use App\Http\Controllers\DiscordInteractionController;
 use App\Http\Controllers\RaffleController;
 use Illuminate\Support\Facades\Route;
 use Rap2hpoutre\LaravelLogViewer\LogViewerController;
@@ -25,7 +26,7 @@ Route::get('auth/discord/callback', [DiscordController::class, 'handleProviderCa
 Route::get('auth/discord', [DiscordController::class, 'redirectToProvider']);
 
 /** Discord webhooks */
-Route::get('discord-raffle-webhook', [RaffleController::class, 'handleDiscordInteraction']);
+Route::get('discord-raffle-webhook', [DiscordInteractionController::class, 'handleDiscordInteraction']);
 
 /** Logs viewer route */
 Route::get('000-logs', [LogViewerController::class, 'index']);

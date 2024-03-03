@@ -28,5 +28,7 @@ class MessageComponentInteractionListener implements ShouldQueue, ApplicationCom
     public function handle(ApplicationCommandInteractionEvent $event): void
     {
         // handle the interaction
+        Log::info('log $event');
+        Log::debug(json_encode($event));
     }
 }

@@ -26,7 +26,7 @@ Route::get('auth/discord/callback', [DiscordController::class, 'handleProviderCa
 Route::get('auth/discord', [DiscordController::class, 'redirectToProvider']);
 
 /** Discord webhooks */
-Route::get('discord-raffle-webhook', [DiscordInteractionController::class, 'handleDiscordInteraction']);
+Route::post('discord-raffle-webhook', [DiscordInteractionController::class, 'handleDiscordInteraction']);
 
 /** Logs viewer route */
 Route::get('000-logs', [LogViewerController::class, 'index']);

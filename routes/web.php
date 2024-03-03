@@ -3,6 +3,7 @@
 use App\Http\Controllers\DiscordController;
 use App\Http\Controllers\DiscordInteractionController;
 use App\Http\Controllers\RaffleController;
+use App\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
 use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 
@@ -26,7 +27,7 @@ Route::get('auth/discord/callback', [DiscordController::class, 'handleProviderCa
 Route::get('auth/discord', [DiscordController::class, 'redirectToProvider']);
 
 /** Discord webhooks */
-Route::post('discord-raffle-webhook', [DiscordInteractionController::class, 'handleDiscordInteraction']);
+Route::post('discord-raffle-webhook', [DiscordInteractionController::class, 'handleDiscordInteraction'])->withoutMiddleware([VerifyCsrfToken::class]);;
 
 /** Logs viewer route */
 Route::get('000-logs', [LogViewerController::class, 'index']);

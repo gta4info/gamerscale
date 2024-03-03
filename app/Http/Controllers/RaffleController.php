@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
 use Nwilging\LaravelDiscordBot\Contracts\Services\DiscordApplicationCommandServiceContract;
+use Nwilging\LaravelDiscordBot\Support\Commands\Options\ChannelOption;
+use Nwilging\LaravelDiscordBot\Support\Commands\Options\StringOption;
 use Nwilging\LaravelDiscordBot\Support\Commands\SlashCommand;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -199,10 +201,13 @@ class RaffleController extends Controller
     {
         $appCommandService = app(DiscordApplicationCommandServiceContract::class);
 
-        $command = new SlashCommand('test1', 'Command description');
+        $command = new SlashCommand('test-opt', 'Command description');
+        $option1 = new ChannelOption('option1', 'description'); // Will allow user to select a channel
+        $option2 = new StringOption('option2', 'free text'); // Allows text input
+
+        $command->option($option1);
+        $command->option($option2);
 
         $result = $appCommandService->createGlobalCommand($command);
-
-        Log::debug($result);
     }
 }

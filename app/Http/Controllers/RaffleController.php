@@ -14,29 +14,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
+use Nwilging\LaravelDiscordBot\Contracts\Services\DiscordApplicationCommandServiceContract;
+use Nwilging\LaravelDiscordBot\Support\Commands\Options\ChannelOption;
+use Nwilging\LaravelDiscordBot\Support\Commands\Options\StringOption;
+use Nwilging\LaravelDiscordBot\Support\Commands\SlashCommand;
 use Symfony\Component\HttpFoundation\Response;
-use Nwilging\LaravelDiscordBot\Contracts\Services\DiscordInteractionServiceContract;
 
 class RaffleController extends Controller
 {
-    private $interactionService;
-
-    public function __construct(DiscordInteractionServiceContract $interactionService)
-    {
-        $this->interactionService = $interactionService;
-    }
-
-    public function handleDiscordInteraction(Request $request)
-    {
-        Log::info(json_encode($request->all()));
-
-        $response = $this->interactionService->handleInteractionRequest($request);
-
-        Log::info(json_encode($response));
-
-        return response()->json($response->toArray(), $response->getStatus());
-    }
-
     /**
      * @throws ValidationException
      */
@@ -211,5 +196,15 @@ class RaffleController extends Controller
             $raffle->winner_ticket_ids = $winner_ticket_ids;
             $raffle->save();
         }
+    }
+    public function test()
+    {
+        $appCommandService = app(DiscordApplicationCommandServiceContract::class);
+
+        $command = new SlashCommand('test1', 'Command description');
+
+        $result = $appCommandService->createGlobalCommand($command);
+
+        Log::debug($result);
     }
 }

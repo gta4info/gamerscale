@@ -2,6 +2,7 @@
 
 namespace App\Events;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 use Nwilging\LaravelDiscordBot\Events\MessageComponentInteractionEvent;
 use Nwilging\LaravelDiscordBot\Contracts\Listeners\MessageComponentInteractionEventListenerContract;
 
@@ -23,5 +24,7 @@ class MessageComponentInteractionListener implements MessageComponentInteraction
     public function handle(MessageComponentInteractionEvent $event): void
     {
         // Handle the event like a normal listener
+        Log::info(123123);
+        Log::debug(json_encode($event));
     }
 }

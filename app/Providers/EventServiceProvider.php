@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Events\MessageComponentInteractionListener;
 use App\Notifications\Raffle\RaffleCreateNotification;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
+use Nwilging\LaravelDiscordBot\Events\ApplicationCommandInteractionEvent;
 use SocialiteProviders\Discord\DiscordExtendSocialite;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 
@@ -23,6 +25,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         Registered::class => [
             SendEmailVerificationNotification::class,
+        ],
+        ApplicationCommandInteractionEvent::class => [
+            MessageComponentInteractionListener::class
         ]
     ];
 
@@ -31,9 +36,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-//        Event::listen(
-//            RaffleCreateNotification::class
-//        );
+        //
     }
 
     /**

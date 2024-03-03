@@ -15,9 +15,27 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
+use Nwilging\LaravelDiscordBot\Contracts\Services\DiscordInteractionServiceContract;
 
 class RaffleController extends Controller
 {
+    private $interactionService;
+
+    public function __construct(DiscordInteractionServiceContract $interactionService)
+    {
+        $this->interactionService = $interactionService;
+    }
+
+    public function handleDiscordInteraction(Request $request)
+    {
+        $response = $this->interactionService->handleInteractionRequest($request);
+
+        Log::info(json_encode($request->all()));
+        Log::info(json_encode($response));
+
+        return response()->json($response->toArray(), $response->getStatus());
+    }
+
     /**
      * @throws ValidationException
      */

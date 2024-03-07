@@ -13,6 +13,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule): void
     {
          $schedule->command('app:raffle-status-change')->everyMinute();
+         $schedule->command('app:remove-not-started-raffles')->everyMinute();
     }
 
     /**

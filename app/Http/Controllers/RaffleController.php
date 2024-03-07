@@ -384,7 +384,7 @@ class RaffleController extends Controller
     {
         if(!count($changes)) return false;
 
-        $uri = env('DISCORD_BOT_APP_URL') . '/update-message';
+        $uri = config('app.DISCORD_BOT_APP_URL')  . '/update-message';
         $data = ['discord_message_id' => $messageId];
 
         foreach ($changes as $key => $val) {

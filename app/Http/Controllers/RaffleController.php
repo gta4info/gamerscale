@@ -334,7 +334,6 @@ class RaffleController extends Controller
                 break;
             }
 
-            Log::info('draw 4');
             $winnerTicketId = array_rand(array_flip($potentialTicketIds));
             $winner_ticket_ids[] = $winnerTicketId;
 

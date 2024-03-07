@@ -253,7 +253,11 @@ class RaffleController extends Controller
     public function purchaseTickets(Raffle $raffle, User $user, int $ticketsAmount): void
     {
         $userBalanceController = new UserBalanceController();
-        $userBalance = $userBalanceController->getCurrentBalanceByType($user, $raffle->currency_type);
+        $type = 0;
+        if($raffle->currency_type === 1) $type = RaffleCurrencyTypeEnum::VBUCKS->value;
+        if($raffle->currency_type === 2) $type = RaffleCurrencyTypeEnum::FIAT->value;
+
+        $userBalance = $userBalanceController->getCurrentBalanceByType($user, $type);
         $amountToSpend = $raffle->cost * $ticketsAmount;
 
         if($userBalance < $amountToSpend) {

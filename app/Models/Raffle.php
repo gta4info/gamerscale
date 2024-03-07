@@ -40,6 +40,11 @@ class Raffle extends Model
                         ->except('updated_at')
                         ->toArray();
 
+                    if(isset($changed['start_at']) || isset($changed['end_at'])) {
+                        $changed['start_at'] = $model->start_at;
+                        $changed['end_at'] = $model->end_at;
+                    }
+
                     if(isset($changed['currency_type'])) {
                         $changed['cost'] = $model->cost;
                     }

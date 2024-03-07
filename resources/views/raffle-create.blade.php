@@ -295,7 +295,7 @@
             $('#errors').empty();
             $('#errors').hide();
 
-            axios.post('http://127.0.0.1:8000/api/raffles/create', {
+            axios.post('{{env('APP_URL')}}/api/raffles/create', {
                 title: $('#title').val(),
                 description: $('#description').val(),
                 currency_type: parseInt($('#currency_type').val()),

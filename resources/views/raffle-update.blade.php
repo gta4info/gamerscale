@@ -317,7 +317,7 @@
 
             if(!Object.keys(dataToUpdate).length) return alert('Изменений не найдено');
 
-            axios.post('http://127.0.0.1:8000/api/raffles/update/{{$raffle->id}}', dataToUpdate).then(res => {
+            axios.post('{{env('APP_URL')}}/api/raffles/update/{{$raffle->id}}', dataToUpdate).then(res => {
                 $('.form-items').remove();
                 $('.success').show();
             }).catch(err => {

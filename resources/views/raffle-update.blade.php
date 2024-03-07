@@ -225,14 +225,14 @@
                             <div class="mt-3 cost-wrapper" style="display: none;">
                                 <label for="cost" class="">Стоимость билета</label>
                                 <span hidden>{{$raffle->cost}}</span>
-                                <input class="form-control" type="number" id="cost" name="cost" placeholder="Стоимость билета" value="{{(int)$raffle->cost}}" required>
+                                <input class="form-control" type="number" id="cost" name="cost" min="0" max="99999" placeholder="Стоимость билета" value="{{(int)$raffle->cost}}" required>
                             </div>
 
                             <div class="mt-3">
                                 <label for="winners_amount" class="">Кол-во победителей*</label>
                                 <span hidden>{{$raffle->winners_amount}}</span>
                                 <input class="form-control" type="number" id="winners_amount" name="winners_amount"
-                                       placeholder="Кол-во победителей" value="{{$raffle->winners_amount}}" min="1"  required>
+                                       placeholder="Кол-во победителей" value="{{$raffle->winners_amount}}" min="1" max="99999" required>
                             </div>
 
                             <div class="mt-3">

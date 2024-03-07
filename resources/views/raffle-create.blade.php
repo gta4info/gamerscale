@@ -221,14 +221,14 @@
 
                             <div class="mt-3 cost-wrapper" style="display: none;">
                                 <label for="cost" class="">Стоимость билета</label>
-                                <input class="form-control" type="number" id="cost" name="cost" value="0" placeholder="Стоимость билета"
+                                <input class="form-control" type="number" id="cost" name="cost" value="0" min="0" max="99999" placeholder="Стоимость билета"
                                        required>
                             </div>
 
                             <div class="mt-3">
                                 <label for="winners_amount" class="">Кол-во победителей*</label>
                                 <input class="form-control" type="number" id="winners_amount" name="winners_amount"
-                                       placeholder="Кол-во победителей" value="1" min="1" required>
+                                       placeholder="Кол-во победителей" value="1" min="1" max="99999" required>
                             </div>
 
                             <div class="mt-3">

@@ -7,12 +7,13 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserBalanceController extends Controller
 {
     public function store(Request $request): JsonResponse
     {
-        $user = (new UserController())->firstOrCreate($request);
+        $user = (new UserController())->updateOrCreate($request);
 
         try {
             /** Check and update fiat */
@@ -56,5 +57,55 @@ class UserBalanceController extends Controller
             ->where('type', '=', $type)
             ->latest('id')
             ->value('amount') ?? 0;
+    }
+
+    public function getBalance(Request $request): JsonResponse
+    {
+        $user = (new UserController())->updateOrCreate($request);
+
+        return response()->json([
+            'vbucks' => $this->getCurrentBalanceByType($user, UserBalanceTypeEnum::VBUCKS->value),
+            'fiat' => $this->getCurrentBalanceByType($user, UserBalanceTypeEnum::FIAT->value)
+        ]);
+    }
+
+    public function create(Request $request): JsonResponse
+    {
+        $user = (new UserController())->updateOrCreate($request);
+
+        $currencyType = (int)$request->post('currency_type');
+        $action = $request->post('action');
+        $amount = $request->post('amount');
+
+        try {
+            $currentAmount = $this->getCurrentBalanceByType($user, $currencyType);
+            $newAmount = 0;
+
+            if($action === 'give') {
+                $newAmount = $currentAmount + $amount;
+            } else {
+                if($currentAmount - $amount > 0) {
+                    $newAmount = $currentAmount - $amount;
+                }
+            }
+
+            $user->balance()->create([
+                'amount' => $newAmount,
+                'type' => $currencyType,
+                'comment' => 'Управление балансом через команду в дискорде'
+            ]);
+
+            return response()->json([
+                'message' => "Баланс пользователя успешно изменен."
+            ]);
+        } catch (\Exception $exception) {
+            Log::info('Error on create balance for user id: ' . $user);
+            Log::info(json_encode($request->all()));
+            Log::error($exception->getMessage());
+
+            return response()->json([
+                'message' => 'Ошибка при обновлении баланса пользователю.'
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
     }
 }

@@ -1,0 +1,9 @@
+{
+    "env": "local",
+    "token": "MTIxMTU5NDUzNTc1MTM5MzMwMA.GmunQf.BRmsP4YgkD5FhuIsxacjKrz64RAtNVCv4WfrUc",
+    "clientId": "1211594535751393300",
+    "guildId": "1213669230214516747",
+    "url_local": "http://127.0.0.1:8000",
+    "api_url_prod": "https://gamerscale.ru",
+    "raffles_channel_id": "1213669491678908478"
+}

@@ -33,6 +33,7 @@ class DiscordController extends Controller
 
             $user = User::updateOrCreate(
             [
+                'oauth_type' => 'discord',
                 'oauth_id' => $discord->id
             ],
             [

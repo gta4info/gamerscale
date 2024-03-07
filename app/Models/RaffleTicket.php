@@ -16,4 +16,9 @@ class RaffleTicket extends Model
     {
         return $this->belongsTo(Raffle::class);
     }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
 }

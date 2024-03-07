@@ -2,11 +2,9 @@
 
 namespace App\Providers;
 
-use App\Listeners\MessageComponentInteractionListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Nwilging\LaravelDiscordBot\Events\ApplicationCommandInteractionEvent;
 use SocialiteProviders\Discord\DiscordExtendSocialite;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 
@@ -24,9 +22,6 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        ApplicationCommandInteractionEvent::class => [
-            MessageComponentInteractionListener::class
-        ]
     ];
 
     /**

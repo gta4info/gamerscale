@@ -185,4 +185,6 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    'DISCORD_BOT_APP_URL' => env('DISCORD_BOT_APP_URL'),
+
 ];

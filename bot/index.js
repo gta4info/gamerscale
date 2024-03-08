@@ -276,11 +276,6 @@ let raffleEmbedContent = (raffle) => {
             inline: true,
         },
         {
-            name: 'Стоимость билета',
-            value: raffle.currency_type !== 0 ? raffle.cost.toString() : '-',
-            inline: true,
-        },
-        {
             name: '\n',
             value: '\n',
             inline: false,
@@ -296,6 +291,14 @@ let raffleEmbedContent = (raffle) => {
             inline: false,
         },
     ];
+
+    if(raffle.currency_type !== 0) {
+        fields.splice(2, 0, {
+            name: 'Стоимость билета',
+            value: raffle.cost.toString(),
+            inline: true,
+        });
+    }
 
     if(raffle.status !== 0) {
         fields.splice(5, 0, {

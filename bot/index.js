@@ -420,7 +420,7 @@ function collectUserObject(data) {
 function winnersTags(array) {
     let tags = [];
     array.forEach((winner, index) => {
-        winnersTags.push(`<@${winner}>`);
+        tags.push(`<@${winner}>`);
     });
 
     return tags;

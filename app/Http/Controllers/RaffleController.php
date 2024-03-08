@@ -345,22 +345,7 @@ class RaffleController extends Controller
             $raffle->save();
         }
 
-        $this->afterDrawDiscordNotification($raffle);
-    }
-
-    public function afterDrawDiscordNotification(Raffle $raffle): void
-    {
-        $winners = [];
-
-        $raffle->tickets()
-            ->with('user')
-            ->whereIn('id', $raffle->winner_ticket_ids)
-            ->get()
-            ->each(function ($ticket) use (&$winners) {
-                $winners[] = $ticket->user->oauth_id;
-            });
-
-        $this->sendChangedInfoToDiscordBot(['winners' => $winners], $raffle->discord_message_id);
+        $this->updateMessage($raffle);
     }
 
     public function notPublishedList(): JsonResponse
@@ -383,16 +368,16 @@ class RaffleController extends Controller
         return response()->json(['list' => $list]);
     }
 
-    public function sendChangedInfoToDiscordBot(array $changes, string $messageId): bool
+    public function updateMessage(Raffle $raffle): bool
     {
-        if(!count($changes)) return false;
-
+        $data = $raffle->toArray();
         $uri = config('app.DISCORD_BOT_APP_URL')  . '/update-message';
-        $data = ['discord_message_id' => $messageId];
 
-        foreach ($changes as $key => $val) {
-            $data[$key] = $val;
+        if($raffle->status === RaffleStatusEnum::COMPLETED->value) {
+            $data['winners'] = $raffle->winners();
         }
+
+        if(isset($data['tickets'])) unset($data['tickets']);
 
         try {
             $res = Http::post($uri, $data);

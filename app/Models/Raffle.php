@@ -34,32 +34,9 @@ class Raffle extends Model
                 $model->end_at = Carbon::parse($model->end_at)->subHours(3)->format('Y-m-d H:i:s');
             }
 
-            if(!$model->isDirty('is_published') && $model->getOriginal('is_published') === true) {
-                if($model->discord_message_id) {
-                    $changed = collect($model->getDirty())
-                        ->except('updated_at')
-                        ->toArray();
-
-                    if(isset($changed['start_at']) || isset($changed['end_at'])) {
-                        $changed['start_at'] = $model->start_at;
-                        $changed['end_at'] = $model->end_at;
-                    }
-
-                    if(isset($changed['currency_type'])) {
-                        $changed['cost'] = $model->cost;
-                    }
-
-                    if(isset($changed['participants_amount'])) {
-                        $changed['status'] = $model->status;
-                    }
-
-                    if(count($changed) && !isset($changed['discord_message_id'])) {
-                        if(isset($changed['winner_ticket_ids'])) unset($changed['winner_ticket_ids']);
-
-                        $response = (new RaffleController())->sendChangedInfoToDiscordBot($changed, $model->discord_message_id);
-                        if(!$response) return false;
-                    }
-                }
+            if($model->discord_message_id) {
+                $response = (new RaffleController())->updateMessage($model);
+                if(!$response) return false;
             }
 
             return true;
@@ -99,5 +76,21 @@ class Raffle extends Model
             get: fn ($value) => (int)$value,
             set: fn ($value) => $value,
         );
+    }
+
+    public function winners(): array
+    {
+        $winners = [];
+        $raffle = Raffle::find($this->attributes['id']);
+
+        $raffle->tickets()
+            ->with('user')
+            ->whereIn('id', $raffle->winner_ticket_ids)
+            ->get()
+            ->each(function ($ticket) use (&$winners) {
+                $winners[] = $ticket->user->oauth_id;
+            });
+
+        return $winners;
     }
 }

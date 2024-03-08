@@ -264,6 +264,55 @@ function removeTempRaffleId(val) {
 
 let raffleEmbedContent = (raffle) => {
     const currencyType = resolveCurrencyType(raffle.currency_type)
+    let fields = [
+        {
+            name: '\n',
+            value: '\n',
+            inline: false,
+        },
+        {
+            name: 'Тип розыгрыша',
+            value: currencyType.type,
+            inline: true,
+        },
+        {
+            name: 'Стоимость билета',
+            value: raffle.currency_type !== 0 ? raffle.cost.toString() : '-',
+            inline: true,
+        },
+        {
+            name: '\n',
+            value: '\n',
+            inline: false,
+        },
+        {
+            name: 'Кол-во призов',
+            value: raffle.winners_amount.toString(),
+            inline: true,
+        },
+        {
+            name: '\n',
+            value: '\n',
+            inline: false,
+        },
+    ];
+
+    if(raffle.status !== 0) {
+        fields.splice(5, 0, {
+            name: 'Кол-во участников',
+            value: raffle.participants_amount.toString(),
+            inline: true,
+        });
+    }
+
+    if(raffle.hasOwnProperty('winners')) {
+        fields.push({
+            name: 'Победители',
+            value: winnersTags(raffle.winners).join(', '),
+            inline: false,
+        })
+    }
+
     return {
         color: currencyType.color,
         title: raffle.title,
@@ -271,38 +320,7 @@ let raffleEmbedContent = (raffle) => {
             name: 'Розыгрыш от GamerScale',
         },
         description: raffle.description,
-        fields: [
-            {
-                name: '\n',
-                value: '\n',
-                inline: false,
-            },
-            {
-                name: 'Тип розыгрыша',
-                value: currencyType.type,
-                inline: true,
-            },
-            {
-                name: 'Стоимость билета',
-                value: raffle.currency_type !== 0 ? raffle.cost : '-',
-                inline: true,
-            },
-            {
-                name: '\n',
-                value: '\n',
-                inline: false,
-            },
-            {
-                name: 'Кол-во призов',
-                value: raffle.winners_amount,
-                inline: true,
-            },
-            {
-                name: '\n',
-                value: '\n',
-                inline: false,
-            },
-        ],
+        fields: fields,
         footer: {
             text: `Начало в: ${moment(raffle.start_at).add(3, 'hours').format('YYYY-MM-DD HH:mm')} МСК\nИтоги в: ${moment(raffle.end_at).add(3, 'hours').format('YYYY-MM-DD HH:mm')} МСК`,
         },
@@ -315,105 +333,30 @@ app.listen(port, () => {
 
 app.post('/update-message', (req, res) => {
     const raffle = req.body;
-    console.log(raffle);
+
     try {
         client.channels.cache.get(raffles_channel_id).messages.fetch(raffle.discord_message_id).then((msg) => {
-            const receivedEmbed = msg.embeds[0];
-            let newEmbed = EmbedBuilder.from(receivedEmbed);
-
-            if(raffle.hasOwnProperty('title')) newEmbed.setTitle(raffle.title);
-            if(raffle.hasOwnProperty('description')) newEmbed.setDescription(raffle.description);
-            if(raffle.hasOwnProperty('start_at') || raffle.hasOwnProperty('end_at')) newEmbed.setFooter({
-                text: `Начало в: ${moment(raffle.start_at).add(3, 'hours').format('YYYY-MM-DD HH:mm')} МСК\nИтоги в: ${moment(raffle.end_at).add(3, 'hours').format('YYYY-MM-DD HH:mm')} МСК`
-            });
-            if(raffle.hasOwnProperty('currency_type')) {
-                const currencyType = resolveCurrencyType(raffle.currency_type);
-                receivedEmbed.data.fields[1].value = currencyType.type
-                newEmbed.setColor(currencyType.color)
-
-                if(raffle.currency_type === '0') receivedEmbed.data.fields[2].value = '-';
-            }
-            if(raffle.hasOwnProperty('cost')) {
-                receivedEmbed.data.fields[2].value = raffle.currency_type !== '0' ? raffle.cost.toString() : '-';
-            }
-            if(raffle.hasOwnProperty('winners_amount')) receivedEmbed.data.fields[3].value = raffle.winners_amount.toString()
-
-            if(raffle.hasOwnProperty('winners')) {
-                let winnersTags = [];
-                raffle.winners.forEach((winner, index) => {
-                    winnersTags.push(`<@${winner}>`);
-                });
-
-                receivedEmbed.data.fields.push({
-                    name: 'Победители',
-                    value: winnersTags.join(', '),
-                    inline: false,
-                })
-
-                msg.reply({content: `Розыгрыш завершен.\nПоздравляем победителей: ${winnersTags.join(', ')}`})
-            }
-
-            if(raffle.hasOwnProperty('message_content')) {
-                const deleteBtn = new ButtonBuilder()
-                    .setCustomId('deleteRaffleBtn')
-                    .setLabel('Удалить')
-                    .setStyle(ButtonStyle.Danger);
-
-                const row = new ActionRowBuilder()
-                    .addComponents(publishBtn, changeBtn, deleteBtn);
-            }
-
-            receivedEmbed.data.fields.map(field => {
-                if(field.name === '') field.name = '\n'
-                if(field.value === '') field.value = '\n'
-                return field;
-            })
-            newEmbed.setFields(...receivedEmbed.data.fields);
-
             let msgObj = {
-                embeds: [newEmbed]
+                content: raffle.discord_message_content,
+                embeds: [raffleEmbedContent(raffle)],
+                components: []
             };
 
-            if(raffle.hasOwnProperty('status')) {
-                switch (raffle.status) {
-                    case 0:
-                        msgObj.components = [];
-                        break;
-                    // When raffle is going active
-                    case 1:
-                        const participateBtn = new ButtonBuilder()
-                            .setCustomId('participateRaffleBtn')
-                            .setLabel('Участвовать')
-                            .setStyle(ButtonStyle.Primary);
-
-                        const row = new ActionRowBuilder()
-                            .addComponents(participateBtn);
-
-                        msgObj.components = [row];
-                        break;
-                    // Raffle completed
-                    case 2:
-                        msgObj.components = [];
-                        break;
-                }
-
-                if(raffle.hasOwnProperty('participants_amount')) {
-                    if(receivedEmbed.data.fields.filter((f) => f.name === 'Кол-во участников').length) {
-                        receivedEmbed.data.fields[5].value = raffle.participants_amount.toString();
-                    } else {
-                        receivedEmbed.data.fields.splice(5, 0, {
-                            name: 'Кол-во участников',
-                            value: raffle.participants_amount.toString(),
-                            inline: true,
-                        });
-                    }
-
-                    newEmbed.setFields(...receivedEmbed.data.fields);
-                }
+            if(raffle.hasOwnProperty('winners')) {
+                msg.reply({content: `Розыгрыш завершен.\nПоздравляем победителей: ${winnersTags(raffle.winners).join(', ')}`})
             }
 
-            if(raffle.hasOwnProperty('discord_message_content')) {
-                msgObj.content = raffle.discord_message_content;
+            // When raffle is going active
+            if(raffle.status === 1) {
+                const participateBtn = new ButtonBuilder()
+                    .setCustomId('participateRaffleBtn')
+                    .setLabel('Участвовать')
+                    .setStyle(ButtonStyle.Primary);
+
+                const row = new ActionRowBuilder()
+                    .addComponents(participateBtn);
+
+                msgObj.components = [row];
             }
 
             msg.edit(msgObj);
@@ -472,4 +415,13 @@ function collectUserObject(data) {
         name: data.globalName,
         avatar_url: `https://cdn.discordapp.com/avatars/${data.id}/${data.avatar}.png`
     }
+}
+
+function winnersTags(array) {
+    let tags = [];
+    array.forEach((winner, index) => {
+        winnersTags.push(`<@${winner}>`);
+    });
+
+    return tags;
 }

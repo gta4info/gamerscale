@@ -187,4 +187,6 @@ return [
 
     'DISCORD_BOT_APP_URL' => env('DISCORD_BOT_APP_URL'),
 
+    'ADMIN_URL' => env('ADMIN_URL'),
+    'VITE_APP_URL' => env('VITE_APP_URL'),
 ];

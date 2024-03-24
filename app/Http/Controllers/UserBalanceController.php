@@ -65,13 +65,16 @@ class UserBalanceController extends Controller
 
         return response()->json([
             'vbucks' => $this->getCurrentBalanceByType($user, UserBalanceTypeEnum::VBUCKS->value),
-            'fiat' => $this->getCurrentBalanceByType($user, UserBalanceTypeEnum::FIAT->value)
+            'fiat' => $this->getCurrentBalanceByType($user, UserBalanceTypeEnum::FIAT->value),
+            'gspoints' => $this->getCurrentBalanceByType($user, UserBalanceTypeEnum::GSPOINTS->value),
         ]);
     }
 
-    public function create(Request $request): JsonResponse
+    public function create(Request $request, User $user = null, string $comment = null): JsonResponse
     {
-        $user = (new UserController())->updateOrCreate($request);
+        if(!$user) {
+            $user = (new UserController())->updateOrCreate($request);
+        }
 
         $currencyType = (int)$request->post('currency_type');
         $action = $request->post('action');
@@ -92,7 +95,7 @@ class UserBalanceController extends Controller
             $user->balance()->create([
                 'amount' => $newAmount,
                 'type' => $currencyType,
-                'comment' => 'Управление балансом через команду в дискорде'
+                'comment' => $comment ?? 'Управление балансом через команду в дискорде'
             ]);
 
             return response()->json([

@@ -3,7 +3,9 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Http\Controllers\UserBalanceController;
 use App\Http\Enums\RaffleStatusEnum;
+use App\Http\Enums\UserBalanceTypeEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -21,14 +23,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'oauth_id',
-        'oauth_type',
-        'avatar_url',
-    ];
+    public $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -58,5 +53,34 @@ class User extends Authenticatable
     public function rafflesTickets(): HasMany
     {
         return $this->hasMany(RaffleTicket::class);
+    }
+
+    public function achievements(): HasMany
+    {
+        return $this->hasMany(AchievementToUser::class);
+    }
+
+    public function achievementPrizes(): HasMany
+    {
+        return $this->hasMany(AchievementPrizeToUser::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->attributes['is_admin'];
+    }
+
+    public function currentBalances(): array
+    {
+        $user = User::find($this->attributes['id']);
+        $arr = [];
+        foreach (UserBalanceTypeEnum::cases() as $type) {
+            $arr[] = [
+                'type' => $type->value,
+                'value' => (new UserBalanceController())->getCurrentBalanceByType($user, $type->value)
+            ];
+        }
+
+        return $arr;
     }
 }

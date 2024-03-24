@@ -24,9 +24,9 @@ class DiscordController extends Controller
     /**
      * Obtain the user information from Discord.
      *
-     * @return RedirectResponse
+     * @return string
      */
-    public function handleProviderCallback(): RedirectResponse
+    public function handleProviderCallback(): string
     {
         try {
             $discord = Socialite::driver('discord')->stateless()->user();
@@ -51,6 +51,12 @@ class DiscordController extends Controller
             Log::error($e);
         }
 
-        return redirect('/');
+        $domain = parse_url(request()->root())['host'];
+
+        if(str_starts_with($domain, 'admin')) {
+            return redirect()->route('admin.home');
+        }
+
+        return redirect()->route('home');
     }
 }

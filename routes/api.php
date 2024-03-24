@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\RaffleController;
 use App\Http\Controllers\UserBalanceController;
+use App\Http\Controllers\UsersController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,10 +18,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::post('user/store-balances', [UserBalanceController::class, 'store']);
 
 Route::prefix('users')->group(function () {
@@ -30,6 +28,7 @@ Route::prefix('users')->group(function () {
 Route::prefix('raffles')->controller(RaffleController::class)->group(function () {
     Route::post('create', 'create');
     Route::post('update/{raffle}', 'update');
+    Route::post('reroll/{raffle:discord_message_id}', 'reroll');
     Route::get('get/{raffle}', 'get');
     Route::get('get-participation-info/{raffle:discord_message_id}', 'getParticipationInfo');
     Route::post('publish/{raffle}', 'publish');
@@ -41,4 +40,13 @@ Route::prefix('raffles')->controller(RaffleController::class)->group(function ()
     Route::get('user-summaries-list', 'getUserSummariesList');
     Route::get('not-published-list', 'notPublishedList');
     Route::get('not-completed-list', 'notCompletedList');
+});
+
+Route::prefix('admin')->middleware(['admin'])->group(function () {
+    Route::prefix('users')->group(function () {
+        Route::get('list/{query?}', [\App\Http\Controllers\Admin\UsersController::class, 'list']);
+    });
+    Route::prefix('user/{user}')->group(function () {
+        Route::get('profile', [\App\Http\Controllers\Admin\UserController::class, 'profile']);
+    });
 });

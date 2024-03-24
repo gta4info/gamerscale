@@ -6,10 +6,12 @@ use App\Http\Enums\RaffleStatusEnum;
 use App\Models\Raffle;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Js;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -61,5 +63,10 @@ class UserController extends Controller
             ->where('is_published', '=', 1)
             ->where('status', '=', RaffleStatusEnum::ACTIVE->value)
             ->get();
+    }
+
+    public function profile(User $user): JsonResponse
+    {
+
     }
 }

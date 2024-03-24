@@ -43,10 +43,18 @@
     {{--                    </li>--}}
                     </ul>
                     <div class="header__actions">
-                        <a href="/auth/discord" class="btn btn-glass btn-sm">
-                            Войти через Discord
-                            <img src="img/discord-icon.svg" alt="Discord">
-                        </a>
+                        @guest
+                            <a href="/auth/discord" class="btn btn-glass btn-sm">
+                                Войти через Discord
+                                <img src="img/discord-icon.svg" alt="Discord">
+                            </a>
+                        @endguest
+                        @auth
+                            <div style="display:flex;align-items: center">
+                                <span style="margin-right: 1rem;">{{auth()->user()->name}}</span>
+                                <a href="/logout">Выйти</a>
+                            </div>
+                        @endauth
                     </div>
                 </header>
                 <main class="main">

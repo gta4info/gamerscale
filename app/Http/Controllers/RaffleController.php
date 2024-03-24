@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
@@ -36,7 +37,7 @@ class RaffleController extends Controller
             'discord_message_content' => 'nullable|max:255'
         ]);
 
-        if($validator->fails()) {
+        if ($validator->fails()) {
             throw new HttpResponseException(
                 response()->json(['errors' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY)
             );
@@ -66,7 +67,7 @@ class RaffleController extends Controller
             'discord_message_content' => 'max:255'
         ]);
 
-        if($validator->fails()) {
+        if ($validator->fails()) {
             throw new HttpResponseException(
                 response()->json(['errors' => $validator->errors()], Response::HTTP_UNPROCESSABLE_ENTITY)
             );
@@ -108,10 +109,10 @@ class RaffleController extends Controller
     public function delete(Raffle $raffle): JsonResponse
     {
         try {
-            if($raffle->tickets()->count()) {
+            if ($raffle->tickets()->count()) {
                 $deleteTickets = $this->deleteTickets($raffle);
 
-                if(!$deleteTickets) throw new \Exception('Произошла ошибка при удалении розыгрыша');
+                if (!$deleteTickets) throw new \Exception('Произошла ошибка при удалении розыгрыша');
             }
 
             $raffle->delete();
@@ -140,13 +141,13 @@ class RaffleController extends Controller
 
     public function participate(Request $request, Raffle $raffle): JsonResponse
     {
-        if($raffle->status === RaffleStatusEnum::COMPLETED->value) {
+        if ($raffle->status === RaffleStatusEnum::COMPLETED->value) {
             throw new HttpResponseException(
                 response()->json(['message' => 'Розыгрыш завершен.'], Response::HTTP_UNPROCESSABLE_ENTITY)
             );
         }
 
-        if($raffle->status === RaffleStatusEnum::PENDING->value) {
+        if ($raffle->status === RaffleStatusEnum::PENDING->value) {
             throw new HttpResponseException(
                 response()->json(['message' => 'Розыгрыш еще не начался.'], Response::HTTP_UNPROCESSABLE_ENTITY)
             );
@@ -157,17 +158,17 @@ class RaffleController extends Controller
 
         try {
             /** Purchasing tickets if raffle is not free */
-            if($raffle->currency_type !== RaffleCurrencyTypeEnum::FREE->value) {
+            if ($raffle->currency_type !== RaffleCurrencyTypeEnum::FREE->value) {
                 $this->purchaseTickets($raffle, $user, $ticketsAmount);
             } else {
-                if($raffle->tickets()->where('user_id', '=', $user->id)->count() >= 1) {
+                if ($raffle->tickets()->where('user_id', '=', $user->id)->count() >= 1) {
                     throw new \Exception('Вы уже участвуете в данном розыгрыше. В бесплатных розыгрышах у вас может быть только **1 билет**!');
                 }
 
                 $ticketsAmount = 1;
             }
 
-            for($i = 1; $i <= $ticketsAmount; $i++) {
+            for ($i = 1; $i <= $ticketsAmount; $i++) {
                 $raffle->tickets()->create([
                     'user_id' => $user->id
                 ]);
@@ -196,7 +197,7 @@ class RaffleController extends Controller
     public function deleteTickets(Raffle $raffle): bool
     {
         // If raffle is free
-        if($raffle->currency_type === RaffleCurrencyTypeEnum::FREE->value) {
+        if ($raffle->currency_type === RaffleCurrencyTypeEnum::FREE->value) {
             $raffle->tickets()->delete();
 
             return true;
@@ -209,7 +210,7 @@ class RaffleController extends Controller
             $user = User::find($userId);
             $res = $this->unParticipate($raffle, $user);
 
-            if(!$res) return false;
+            if (!$res) return false;
         }
 
         return true;
@@ -221,7 +222,7 @@ class RaffleController extends Controller
             $totalTicketsAmount = $raffle->tickets()->where('user_id', '=', $user->id)
                 ->count();
 
-            if($raffle->currency_type === RaffleCurrencyTypeEnum::VBUCKS->value) {
+            if ($raffle->currency_type === RaffleCurrencyTypeEnum::VBUCKS->value) {
                 $balanceType = UserBalanceTypeEnum::VBUCKS->value;
             } else {
                 $balanceType = UserBalanceTypeEnum::FIAT->value;
@@ -254,17 +255,17 @@ class RaffleController extends Controller
     {
         $userBalanceController = new UserBalanceController();
         $type = 0;
-        if($raffle->currency_type === 1) $type = UserBalanceTypeEnum::VBUCKS->value;
-        if($raffle->currency_type === 2) $type = UserBalanceTypeEnum::FIAT->value;
+        if ($raffle->currency_type === 1) $type = UserBalanceTypeEnum::VBUCKS->value;
+        if ($raffle->currency_type === 2) $type = UserBalanceTypeEnum::FIAT->value;
 
         $userBalance = $userBalanceController->getCurrentBalanceByType($user, $type);
         $amountToSpend = $raffle->cost * $ticketsAmount;
 
-        if($userBalance < $amountToSpend) {
+        if ($userBalance < $amountToSpend) {
             throw new \Exception('Недостаточно средств для покупки билетов. На вашем счету: ' . $userBalance);
         }
 
-        if($raffle->currency_type === RaffleCurrencyTypeEnum::VBUCKS->value) {
+        if ($raffle->currency_type === RaffleCurrencyTypeEnum::VBUCKS->value) {
             $balanceType = UserBalanceTypeEnum::VBUCKS->value;
         } else {
             $balanceType = UserBalanceTypeEnum::FIAT->value;
@@ -312,13 +313,19 @@ class RaffleController extends Controller
         return response()->json($data);
     }
 
-    public function draw(Raffle $raffle): void
+    public function draw(Raffle $raffle, bool $is_reroll): void
     {
-        if(!$raffle->is_published) return;
+        Log::info(555);
+        if (!$raffle->is_published) return;
 
-        for($i = 1; $i <= $raffle->winners_amount; $i++) {
-            $winner_ticket_ids = $raffle->winner_ticket_ids ?? [];
-            if(count($winner_ticket_ids) >= $raffle->winners_amount) {
+        for ($i = 1; $i <= $raffle->winners_amount; $i++) {
+            if($is_reroll) {
+                $winner_ticket_ids = [];
+            } else {
+                $winner_ticket_ids = $raffle->winner_ticket_ids ?? [];
+            }
+
+            if (count($winner_ticket_ids) >= $raffle->winners_amount) {
                 break;
             }
 
@@ -334,7 +341,7 @@ class RaffleController extends Controller
                 ->pluck('id')
                 ->all();
 
-            if(count($potentialTicketIds) === 0) {
+            if (count($potentialTicketIds) === 0) {
                 break;
             }
 
@@ -371,13 +378,13 @@ class RaffleController extends Controller
     public function updateMessage(Raffle $raffle): bool
     {
         $data = $raffle->toArray();
-        $uri = config('app.DISCORD_BOT_APP_URL')  . '/update-message';
+        $uri = config('app.DISCORD_BOT_APP_URL') . '/update-message';
 
-        if($raffle->status === RaffleStatusEnum::COMPLETED->value) {
+        if ($raffle->status === RaffleStatusEnum::COMPLETED->value) {
             $data['winners'] = $raffle->winners();
         }
 
-        if(isset($data['tickets'])) unset($data['tickets']);
+        if (isset($data['tickets'])) unset($data['tickets']);
 
         try {
             $res = Http::post($uri, $data);
@@ -396,5 +403,25 @@ class RaffleController extends Controller
             'type' => $raffle->currency_type,
             'cost' => $raffle->cost
         ]);
+    }
+
+    public function reroll(Raffle $raffle): JsonResponse
+    {
+        try {
+            $raffle->update([
+                'winner_ticket_ids' => null,
+                'end_at' => now()
+            ]);
+
+            $this->draw($raffle, true);
+        } catch (\Exception $exception) {
+            Log::info('Error on reroll raffle id: ' . $raffle->id);
+            Log::error($exception->getMessage());
+            return response()->json([
+                'message' => 'Произошла ошибка при реролле розыгрыша.'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json(['message' => 'Определены новые победители розыгрыша.']);
     }
 }

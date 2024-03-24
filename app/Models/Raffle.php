@@ -85,7 +85,7 @@ class Raffle extends Model
 
         $raffle->tickets()
             ->with('user')
-            ->whereIn('id', $raffle->winner_ticket_ids)
+            ->whereIn('id', $raffle->winner_ticket_ids ?? [])
             ->get()
             ->each(function ($ticket) use (&$winners) {
                 $winners[] = $ticket->user->oauth_id;

@@ -23,12 +23,31 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $epicName = fake()->randomElement([null, fake()->name()]);
+
+        $randomImages =[
+            'https://m.media-amazon.com/images/I/41WpqIvJWRL._AC_UY436_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/61ghDjhS8vL._AC_UY436_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/61c1QC4lF-L._AC_UY436_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/710VzyXGVsL._AC_UY436_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/61EPT-oMLrL._AC_UY436_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/71r3ktfakgL._AC_UY436_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/61CqYq+xwNL._AC_UL640_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/71cVOgvystL._AC_UL640_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/71E+oh38ZqL._AC_UL640_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/61uSHBgUGhL._AC_UL640_QL65_.jpg',
+            'https://m.media-amazon.com/images/I/71nDK2Q8HAL._AC_UL640_QL65_.jpg'
+        ];
+
         return [
             'name' => fake()->name(),
+            'epic_name' => $epicName,
+            'epic_id' => $epicName ?? fake()->uuid,
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'avatar_url' => fake()->randomElement([null, $randomImages[rand(0, 10)]]),
+            'oauth_type' => 'discord',
+            'oauth_id' => fake()->numerify('##################')
         ];
     }
 

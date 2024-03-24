@@ -4,6 +4,9 @@ namespace App\Http\Middleware;
 
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redirect;
 
 class Authenticate extends Middleware
 {
@@ -12,6 +15,13 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('login');
+        if(!Auth::user()) {
+            $domain = parse_url(request()->root())['host'];
+            $route = str_starts_with($domain, 'admin') ? 'admin.auth.discord' : 'auth.discord';
+
+            return $request->expectsJson() ? null : route($route);
+        }
+
+        return null;
     }
 }

@@ -301,7 +301,8 @@ let raffleEmbedContent = (raffle) => {
     }
 
     if(raffle.status !== 0) {
-        fields.splice(5, 0, {
+        let index = raffle.currency_type === 0 ? 4 : 5;
+        fields.splice(index, 0, {
             name: 'Кол-во участников',
             value: raffle.participants_amount.toString(),
             inline: true,

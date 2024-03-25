@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use IlyaHoilik\Socialite\EpicGames\EpicGamesExtendSocialite;
 use SocialiteProviders\Discord\DiscordExtendSocialite;
 use SocialiteProviders\Manager\SocialiteWasCalled;
 
@@ -18,6 +19,7 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         SocialiteWasCalled::class => [
             DiscordExtendSocialite::class.'@handle',
+            EpicGamesExtendSocialite::class.'@handle',
         ],
         Registered::class => [
             SendEmailVerificationNotification::class,

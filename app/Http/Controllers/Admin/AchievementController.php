@@ -128,6 +128,10 @@ class AchievementController extends Controller
                 $data['icon'] = (new Controller())->uploadImage($request->file('icon'), 'achievements');
             }
 
+            if($request->post('is_active')) {
+                $data['is_active'] = !($request->post('is_active') == 'false');
+            }
+
             foreach ($data as $k => $v) {
                 if($achievement->$k != $v) {
                     $updates[$k] = $v;

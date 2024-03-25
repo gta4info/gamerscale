@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\DiscordController;
+use App\Http\Controllers\EpicGamesController;
+use App\Http\Controllers\FrontController;
+use App\Http\Controllers\UserController;
 use App\Models\Raffle;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -25,13 +28,13 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-Route::get('test', function () {
-    return Inertia::render('Test');
-});
+/** Discord auth routes */
+Route::get('auth/discord/callback', [DiscordController::class, 'handleProviderCallback'])->name('auth.discord.callback');
+Route::get('auth/discord', [DiscordController::class, 'redirectToProvider'])->name('auth.discord');
 
 /** Discord auth routes */
-Route::get('auth/discord/callback', [DiscordController::class, 'handleProviderCallback'])->name('auth.discord.callback');;
-Route::get('auth/discord', [DiscordController::class, 'redirectToProvider'])->name('auth.discord');
+Route::get('integrate-epic-games', [EpicGamesController::class, 'redirectToProvider'])->name('auth.epic-games');
+Route::get('integrate-epic-games/callback', [EpicGamesController::class, 'handleProviderCallback'])->name('auth.epic-games.callback');
 
 /** Raffles */
 Route::get('raffle-create-view', function () {
@@ -48,3 +51,9 @@ Route::get('logout', function () {
     Auth::logout();
     return redirect('/');
 })->name('logout');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('achievements', [FrontController::class, 'achievements']);
+    Route::get('leaderboard', [FrontController::class, 'leaderboard']);
+    Route::get('profile/{user?}', [FrontController::class, 'profile']);
+});

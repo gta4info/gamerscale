@@ -2,16 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Http\Controllers\Admin\AchievementController;
 use App\Http\Controllers\UserBalanceController;
-use App\Http\Enums\RaffleStatusEnum;
 use App\Http\Enums\UserBalanceTypeEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -44,6 +41,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public static function boot(): void
+    {
+        parent::boot();
+
+        self::created(function ($model) {
+            // Assign achievements to user
+            (new AchievementController())->assignAchievementsToUser($model);
+        });
+    }
 
     public function balance(): HasMany
     {

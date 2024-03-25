@@ -39,4 +39,10 @@ return [
         'avatar_default_extension' => env('DISCORD_EXTENSION_DEFAULT', 'jpg'),
     ],
 
+    'epicgames' => [
+        'client_id' => env('EPIC_GAMES_CLIENT_ID'),
+        'client_secret' => env('EPIC_GAMES_CLIENT_SECRET'),
+        'redirect' => env('EPIC_GAMES_REDIRECT_URI'),
+    ],
+
 ];

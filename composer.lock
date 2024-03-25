@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fe15df336772c396f0acf034923da60e",
+    "content-hash": "1465934ecbcda9074d799d8f33248c29",
     "packages": [
         {
             "name": "brick/math",
@@ -1044,6 +1044,48 @@
                 }
             ],
             "time": "2023-12-03T19:50:20+00:00"
+        },
+        {
+            "name": "ilyahoilik/laravel-socialite-epic-games",
+            "version": "v1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ilyahoilik/laravel-socialite-epic-games.git",
+                "reference": "9d36562fc668c810e1d020cc77b313697cd98b20"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ilyahoilik/laravel-socialite-epic-games/zipball/9d36562fc668c810e1d020cc77b313697cd98b20",
+                "reference": "9d36562fc668c810e1d020cc77b313697cd98b20",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": "^7.2 || ^8.0",
+                "socialiteproviders/manager": "~4.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "IlyaHoilik\\Socialite\\EpicGames\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ilya Hoilik",
+                    "email": "ilya@hoilik.com"
+                }
+            ],
+            "description": "Epic Games OAuth2 Provider for Laravel Socialite",
+            "support": {
+                "issues": "https://github.com/ilyahoilik/laravel-socialite-epic-games/issues",
+                "source": "https://github.com/ilyahoilik/laravel-socialite-epic-games/tree/v1.0.1"
+            },
+            "time": "2022-07-18T19:49:04+00:00"
         },
         {
             "name": "inertiajs/inertia-laravel",

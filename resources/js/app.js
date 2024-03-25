@@ -30,21 +30,30 @@ const momentPlugin = {
     }
 }
 
+// Emitter
+import mitt from 'mitt';
+const emitter = mitt();
+
 InertiaProgress.init()
 
 const vuetify = createVuetify({
     components,
-    directives
+    directives,
+    theme: {
+        defaultTheme: 'dark'
+    }
 })
 
 createInertiaApp({
     resolve: name => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
+        const app = createApp({ render: () => h(App, props) })
             .use(plugin)
             .use(vuetify)
             .use(momentPlugin)
             .component('inertia-link', Link)
-            .mount(el)
+
+        app.config.globalProperties.emitter = emitter
+        app.mount(el)
     },
 })

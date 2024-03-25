@@ -65,7 +65,7 @@ class HandleInertiaRequests extends Middleware
         if(str_starts_with($domain, 'admin')) {
             return 'layouts/admin';
         } else {
-            return 'layouts/public';
+            return 'layouts/front';
         }
     }
 }

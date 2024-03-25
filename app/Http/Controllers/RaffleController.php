@@ -315,7 +315,6 @@ class RaffleController extends Controller
 
     public function draw(Raffle $raffle, bool $is_reroll): void
     {
-        Log::info(555);
         if (!$raffle->is_published) return;
 
         for ($i = 1; $i <= $raffle->winners_amount; $i++) {

@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Js;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
@@ -63,10 +64,5 @@ class UserController extends Controller
             ->where('is_published', '=', 1)
             ->where('status', '=', RaffleStatusEnum::ACTIVE->value)
             ->get();
-    }
-
-    public function profile(User $user): JsonResponse
-    {
-
     }
 }

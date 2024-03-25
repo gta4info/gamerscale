@@ -2,10 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Jobs\AssignAchievementToUsers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Achievement extends Model
@@ -18,9 +17,22 @@ class Achievement extends Model
         'levels' => 'array'
     ];
 
+    public static function boot(): void
+    {
+        parent::boot();
+
+        self::updated(function ($model) {
+            // If status is updated to active
+            if($model->is_active) {
+                // Assign achievement to users
+                AssignAchievementToUsers::dispatch($model);
+            }
+        });
+    }
+
     public function users(): HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(AchievementToUser::class);
     }
 
     public function prizes(): HasMany

@@ -51,7 +51,7 @@ class FrontController extends Controller
 
     public function achievements(): Response
     {
-        $achievements = Cache::remember('user-achievements', 60, function () {
+        $achievements = Cache::remember('user-achievements-id-'.auth()->id(), 60, function () {
             return auth()->user()
                 ->achievements()
                 ->orderBy('achievement_id')

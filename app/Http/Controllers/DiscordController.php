@@ -57,6 +57,6 @@ class DiscordController extends Controller
             return redirect()->route('admin.home');
         }
 
-        return redirect()->route('profile');
+        return to_route('profile');
     }
 }

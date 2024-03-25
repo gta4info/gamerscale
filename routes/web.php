@@ -55,5 +55,5 @@ Route::get('logout', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('achievements', [FrontController::class, 'achievements']);
     Route::get('leaderboard', [FrontController::class, 'leaderboard']);
-    Route::get('profile/{user?}', [FrontController::class, 'profile']);
+    Route::get('profile/{user?}', [FrontController::class, 'profile'])->name('profile');
 });

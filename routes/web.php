@@ -52,6 +52,10 @@ Route::get('logout', function () {
     return redirect('/');
 })->name('logout');
 
+Route::get('privacy-policy', function () {
+    return view('privacy-policy');
+});
+
 Route::middleware(['auth'])->group(function () {
     Route::get('achievements', [FrontController::class, 'achievements']);
     Route::get('leaderboard', [FrontController::class, 'leaderboard']);

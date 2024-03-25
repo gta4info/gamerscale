@@ -32,6 +32,7 @@
                             <v-img :src="profileUser.avatar_url" width="98px" height="98px"></v-img>
                         </div>
                         <div class="profile__info-name">{{profileUser.name}}</div>
+                        <div class="profile__info-joined text-grey">Дата регистрации {{$moment(profileUser.created_at).format('MM.DD.YYYY')}}</div>
                     </div>
                     <div class="profile__tabs">
                         <inertia-link
@@ -74,18 +75,21 @@ export default {
             id: null,
             avatar_url: '',
             name: '',
+            created_at: '',
         }
     }),
     created() {
         this.profileUser.id = this.$page.props.auth.user.id;
         this.profileUser.avatar_url = this.$page.props.auth.user.avatar_url;
         this.profileUser.name = this.$page.props.auth.user.name;
+        this.profileUser.created_at = this.$page.props.auth.user.created_at;
     },
     mounted() {
         this.emitter.on('share-user-object-to-layout', (data) => {
             this.profileUser.id = data.id;
             this.profileUser.avatar_url = data.avatar_url;
             this.profileUser.name = data.name;
+            this.profileUser.created_at = data.created_at;
         })
     }
 }

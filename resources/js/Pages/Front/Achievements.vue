@@ -1,5 +1,6 @@
 <template>
     <FrontLayout>
+        <v-container>
             <v-row>
                 <v-col cols="12" md="3" v-for="achievement in achievements">
                     <div class="achievement">
@@ -23,6 +24,8 @@
                     </div>
                 </v-col>
             </v-row>
+        </v-container>
+
     </FrontLayout>
 </template>
 

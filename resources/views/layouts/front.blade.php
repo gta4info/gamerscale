@@ -28,6 +28,12 @@
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <style>
+        @media (min-width: 1920px) {
+            .v-container {
+                max-width: 1200px !important;
+            }
+        }
+
         .v-application {
             background: url(/img/bg-profile.png) no-repeat #010818 !important;
             background-size: 100% auto !important;

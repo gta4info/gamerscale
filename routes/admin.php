@@ -32,6 +32,9 @@ Route::domain('admin.'.config('app.url'))->group(function () {
         });
 
         Route::prefix('prizes')->group(function () {
+            Route::get('history', [PrizesController::class, 'history']);
+            Route::get('history/view/{prize}', [PrizesController::class, 'historyViewPrize']);
+            Route::post('history/update/{prize}', [PrizesController::class, 'historyUpdatePrize']);
             Route::get('list', [PrizesController::class, 'list']);
             Route::get('create', [PrizesController::class, 'renderCreateView']);
             Route::post('create', [PrizesController::class, 'create']);

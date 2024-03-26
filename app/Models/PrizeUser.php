@@ -17,7 +17,7 @@ class PrizeUser extends Model
     public $guarded = [];
 
     protected $casts = [
-        'data' => 'object'
+        'data' => 'array'
     ];
 
     public function prizable(): MorphTo
@@ -35,11 +35,11 @@ class PrizeUser extends Model
         return $this->belongsTo(Prize::class);
     }
 
-    public function parent(): BelongsTo
+    public function parent(): Model
     {
         $className = $this->attributes['prizable_type'];
         $related = new $className();
 
-        return $this->belongsTo($related, 'prizable_id', 'id');
+        return $this->belongsTo($related, 'prizable_id', 'id')->first();
     }
 }

@@ -115,6 +115,7 @@ export default defineComponent({
             ['Список всех', 'mdi-account-multiple-outline', '/users/list'],
         ],
         prizes: [
+            ['Запросы на выдачу', 'mdi-account-multiple-outline', '/prizes/history'],
             ['Список всех', 'mdi-account-multiple-outline', '/prizes/list'],
             ['Добавить', 'mdi-plus', '/prizes/create'],
         ],

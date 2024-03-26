@@ -34,9 +34,9 @@ class FrontController extends Controller
                     $prizes['gspoints']['amountAwaiting'] = $prizes['gspoints']['amountAwaiting'] + $prize->prize->value;
                 }
             } else { // Each other prize has self item
-                $prize->status = $this->resolvePrizeStatusArray($prize->status);
+                $prize->status = (new PrizeUserController())->resolvePrizeStatus($prize->status);
+                $prize->cardText = (new PrizeUserController())->resolvePrizeCardText($prize);
 
-                $prize->cardText = $this->resolvePrizeCardText($prize);
                 $prizes['others'][] = $prize;
             }
         }
@@ -45,23 +45,6 @@ class FrontController extends Controller
             'user' => $userObj,
             'prizes' => collect($prizes)
         ]);
-    }
-
-    public function resolvePrizeStatusArray(int $status): array
-    {
-        return match ($status) {
-            PrizeStatusEnum::IN_PROGRESS->value => ['value' => $status, 'text' => 'В процессе выдачи', 'class' => 'in-progress'],
-            PrizeStatusEnum::COMPLETED->value => ['value' => $status, 'text' => 'Получен', 'class' => 'completed'],
-            default => ['value' => $status, 'text' => 'В ожидании', 'class' => 'pending'],
-        };
-    }
-
-    public function resolvePrizeCardText($prize): string
-    {
-        return match($prize->prizable_type) {
-            'App\Models\Achievement' => "Получен за достижение <strong>{$prize->data->level} уровня</strong> в ачивке <strong>\"{$prize->parent->title}\"</strong>",
-            default => 'Автоматическая выдача приза'
-        };
     }
 
     public function achievements(): Response

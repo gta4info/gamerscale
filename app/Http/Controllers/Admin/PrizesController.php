@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\PrizeUserController;
+use App\Http\Enums\PrizeStatusEnum;
 use App\Http\Enums\PrizeTypeEnum;
 use App\Models\Prize;
+use App\Models\PrizeUser;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -71,6 +74,20 @@ class PrizesController extends Controller
         return $types;
     }
 
+    public function getStatuses(): array
+    {
+        $types = [];
+
+        foreach (PrizeStatusEnum::cases() as $case) {
+            $types[] = [
+                'value' => $case->value,
+                'title' => $case->name
+            ];
+        }
+
+        return $types;
+    }
+
     public function renderCreateView(): Response
     {
         return Inertia::render('Admin/Prize/Create', [
@@ -105,9 +122,6 @@ class PrizesController extends Controller
         }
     }
 
-    /**
-     * @throws ValidationException
-     */
     public function update(Prize $prize, Request $request): JsonResponse
     {
         $this->validation($request);
@@ -156,5 +170,94 @@ class PrizesController extends Controller
                 response()->json(['errors' => $validator->errors()], \Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY)
             );
         }
+    }
+
+    public function history(): Response
+    {
+        return Inertia::render('Admin/Prizes/History', [
+            'prizes' => PrizeUser::with(['user', 'prize'])
+                ->orderByDesc('id')
+                ->get()
+                ->each(function ($item) {
+                    $item->parent = $item->parent();
+                    $item->category = $this->getCategories()[$item->prizable_type];
+                }),
+            'statuses' => $this->getStatuses(),
+            'categories' => $this->getCategories()
+        ]);
+    }
+
+    public function historyViewPrize(PrizeUser $prize): Response
+    {
+        $prize->parent = $prize->parent();
+        $prize->category = $this->getCategories()[$prize->prizable_type];
+        $prize->status = (new PrizeUserController())->resolvePrizeStatus($prize->status);
+        $prize->cardText = (new PrizeUserController())->resolvePrizeCardText($prize);
+
+        $prizeData = [];
+        foreach ($prize->data as $key => $val) {
+            $prizeData[$key] = $val;
+        }
+        if(!isset($prizeData['comment'])) {
+            $prizeData['comment'] = '';
+            $prize->data = $prizeData;
+        }
+
+        return Inertia::render('Admin/Prizes/HistoryView', [
+            'prize' => $prize->load(['user','prize']),
+            'statuses' => $this->getStatuses(),
+        ]);
+    }
+
+    public function historyUpdatePrize(PrizeUser $prize, Request $request): JsonResponse
+    {
+        try {
+            DB::transaction(function () use($prize, $request) {
+                $updates = [];
+
+                if($prize->status !== $request->post('status')) {
+                    $updates['status'] = $request->post('status');
+                }
+
+                if(
+                    !isset($prize->data['comment'])
+                    || $prize->data['comment'] !== $request->post('comment')
+                ) {
+                    $updates['data->comment'] = $request->post('comment');
+                }
+
+                $prize->update($updates);
+            });
+        } catch (\Exception $exception) {
+            Log::error('Ошибка при обновлении истории выдачи приза id: '.$prize->id);
+            Log::error($exception->getMessage());
+            Log::error(json_encode($request->all()));
+
+            return response()->json([
+                'message' => 'Ошибка при обновлении истории выдачи приза.'
+            ], ResponseAlias::HTTP_BAD_REQUEST);
+        }
+
+        return response()->json([
+            'message' => 'Информация успешно обновлена.'
+        ]);
+    }
+
+    public function getCategories(): array
+    {
+        return [
+            'App\Models\Achievement' => [
+                'value' => 0,
+                'title' => 'Ачивки'
+            ],
+            'App\Models\Quest' => [
+                'value' => 1,
+                'title' => 'Квесты'
+            ],
+            'App\Models\Tournament' => [
+                'value' => 2,
+                'title' => 'Турниры'
+            ],
+        ];
     }
 }

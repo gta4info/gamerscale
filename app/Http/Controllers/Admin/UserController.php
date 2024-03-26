@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\UserBalanceController;
 use App\Http\Enums\ActionLogTypeEnum;
 use App\Http\Enums\UserBalanceTypeEnum;
+use App\Models\Achievement;
 use App\Models\ActionLog;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -32,9 +33,8 @@ class UserController extends BaseController
             'user' => $user->load([
                 'balance',
                 'achievements' => function($query) {
-                    $query->with('achievement');
+                    $query->with('achievement')->orderBy('achievement_id');
                 },
-                'achievementPrizes',
             ]),
             'current_balances' => $user->currentBalances(),
             'balance_types' => $balanceTypes
@@ -79,13 +79,35 @@ class UserController extends BaseController
     {
         try {
             DB::transaction(function () use($user, $request) {
-                foreach ($request->post('achievements') as $achievement) {
+                foreach ($request->post('achievements') as $item) {
+                    $achievement = Achievement::find($item['achievement_id']);
+
+                    for($i = 1; $i <= $item['level']; $i++) {
+                        foreach ($achievement->prizes()->where('level', '=', $i)->get() as $prize) {
+                            if(
+                                $achievement->prizeUsers()
+                                    ->where([
+                                        'user_id' => $user->id,
+                                        'prize_id' => $prize->prize_id
+                                    ])
+                                    ->whereJsonContains('data->level', $i)
+                                    ->count() === 0
+                            ) {
+                                $achievement->prizeUsers()->create([
+                                    'user_id' => $user->id,
+                                    'prize_id' => $prize->prize_id,
+                                    'data' => ['level' => $i]
+                                ]);
+                            }
+                        }
+                    }
+
                     $user->achievements()
-                        ->where('achievement_id', '=', $achievement['achievement_id'])
+                        ->where('achievement_id', '=', $item['achievement_id'])
                         ->first()
                         ->update([
-                            'level' => $achievement['level'],
-                            'progress' => $achievement['progress']
+                            'level' => $item['level'],
+                            'progress' => $item['progress']
                         ]);
                 }
             });

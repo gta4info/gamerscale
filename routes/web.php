@@ -25,7 +25,11 @@ use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 require_once 'admin.php';
 
 Route::get('/', function () {
-    return view('home');
+    if(!auth()->id()) {
+        return view('home');
+    } else {
+        return to_route('profile');
+    }
 })->name('home');
 
 /** Discord auth routes */
@@ -59,5 +63,7 @@ Route::get('privacy-policy', function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('achievements', [FrontController::class, 'achievements']);
     Route::get('leaderboard', [FrontController::class, 'leaderboard']);
+    Route::get('tournaments', [FrontController::class, 'tournaments']);
+    Route::get('quests', [FrontController::class, 'quests']);
     Route::get('profile/{user?}', [FrontController::class, 'profile'])->name('profile');
 });

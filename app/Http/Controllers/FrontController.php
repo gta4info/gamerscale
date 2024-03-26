@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Enums\AchievementPrizeUserStatusEnum;
+use App\Http\Enums\PrizeStatusEnum;
 use App\Http\Enums\LeaderboardStatusEnum;
 use App\Http\Enums\PrizeTypeEnum;
 use App\Models\Leaderboard;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -24,21 +25,18 @@ class FrontController extends Controller
             'others' => []
         ];
 
-        foreach ($userObj->achievementPrizes->load(['achievement', 'prize']) as $prize) {
+        foreach ($userObj->prizes()->orderByDesc('id')->get() as $prize) {
+            // Calculate all GSPoints to single item
             if($prize->prize->type === PrizeTypeEnum::GSPOINTS->value) {
-                if($prize->status === AchievementPrizeUserStatusEnum::COMPLETED->value) {
+                if($prize->status === PrizeStatusEnum::COMPLETED->value) {
                     $prizes['gspoints']['amountReceived'] = $prizes['gspoints']['amountReceived'] + $prize->prize->value;
                 } else {
                     $prizes['gspoints']['amountAwaiting'] = $prizes['gspoints']['amountAwaiting'] + $prize->prize->value;
                 }
-            } else {
-                $prize->status = match ($prize->status) {
-                    AchievementPrizeUserStatusEnum::IN_PROGRESS->value => ['value' => $prize->status, 'text' => 'В процессе выдачи', 'class' => 'in-progress'],
-                    AchievementPrizeUserStatusEnum::COMPLETED->value => ['value' => $prize->status, 'text' => 'Получен', 'class' => 'completed'],
-                    default => ['value' => $prize->status, 'text' => 'В ожидании', 'class' => 'pending'],
-                };
+            } else { // Each other prize has self item
+                $prize->status = $this->resolvePrizeStatusArray($prize->status);
 
-                $prize->cardText = "Получен за достижение <strong>{$prize->level} уровня</strong> в ачивке <strong>\"{$prize->achievement->title}\"</strong>";
+                $prize->cardText = $this->resolvePrizeCardText($prize);
                 $prizes['others'][] = $prize;
             }
         }
@@ -47,6 +45,23 @@ class FrontController extends Controller
             'user' => $userObj,
             'prizes' => collect($prizes)
         ]);
+    }
+
+    public function resolvePrizeStatusArray(int $status): array
+    {
+        return match ($status) {
+            PrizeStatusEnum::IN_PROGRESS->value => ['value' => $status, 'text' => 'В процессе выдачи', 'class' => 'in-progress'],
+            PrizeStatusEnum::COMPLETED->value => ['value' => $status, 'text' => 'Получен', 'class' => 'completed'],
+            default => ['value' => $status, 'text' => 'В ожидании', 'class' => 'pending'],
+        };
+    }
+
+    public function resolvePrizeCardText($prize): string
+    {
+        return match($prize->prizable_type) {
+            'App\Models\Achievement' => "Получен за достижение <strong>{$prize->data->level} уровня</strong> в ачивке <strong>\"{$prize->parent->title}\"</strong>",
+            default => 'Автоматическая выдача приза'
+        };
     }
 
     public function achievements(): Response
@@ -79,6 +94,22 @@ class FrontController extends Controller
         });
         return Inertia::render('Front/Leaderboard', [
             'leaderboard' => $leaderboard
+        ]);
+    }
+
+    public function quests(): Response
+    {
+        $quests = [];
+        return Inertia::render('Front/Quests', [
+            'quests' => $quests
+        ]);
+    }
+
+    public function tournaments(): Response
+    {
+        $tournaments = [];
+        return Inertia::render('Front/Tournaments', [
+            'tournaments' => $tournaments
         ]);
     }
 }

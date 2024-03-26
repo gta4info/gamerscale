@@ -2,7 +2,7 @@
 
 namespace App\Http\Enums;
 
-enum AchievementPrizeUserStatusEnum: int
+enum PrizeStatusEnum: int
 {
     case PENDING = 0;
     case WAITING_FOR_DETAILS = 1;

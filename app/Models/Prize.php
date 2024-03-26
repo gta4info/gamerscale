@@ -17,11 +17,6 @@ class Prize extends Model
         return $this->belongsToMany(Achievement::class, 'prize_achievement');
     }
 
-    public function achievementPrizeToUser(): BelongsToMany
-    {
-        return $this->belongsToMany(AchievementPrizeToUser::class, 'achievement_prize_to_users', 'prize_id');
-    }
-
     public function getIconAttribute($value): string|null
     {
         if($value) {

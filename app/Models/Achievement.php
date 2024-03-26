@@ -6,6 +6,7 @@ use App\Jobs\AssignAchievementToUsers;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Achievement extends Model
 {
@@ -35,16 +36,6 @@ class Achievement extends Model
         return $this->hasMany(AchievementToUser::class);
     }
 
-    public function prizes(): HasMany
-    {
-        return $this->hasMany(PrizeAchievement::class, 'achievement_id', 'id');
-    }
-
-    public function userPrizes(): HasMany
-    {
-        return $this->hasMany(AchievementPrizeToUser::class);
-    }
-
     public function getIconAttribute($value): string|null
     {
         if($value) {
@@ -52,5 +43,15 @@ class Achievement extends Model
         }
 
         return null;
+    }
+
+    public function prizes(): HasMany
+    {
+        return $this->hasMany(PrizeAchievement::class);
+    }
+
+    public function prizeUsers(): MorphMany
+    {
+        return $this->morphMany(PrizeUser::class, 'prizable');
     }
 }

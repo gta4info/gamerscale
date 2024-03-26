@@ -263,7 +263,7 @@ export default {
                     this.changedAchievements = false;
                     alert(res.data.message)
                 })
-                .catch(err => err.response.data.message)
+                .catch(err => alert(err.response.data.message))
         },
         updateUserBalance() {
             axios.post(`/user/balance/${this.user.id}`, {

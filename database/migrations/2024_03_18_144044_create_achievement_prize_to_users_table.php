@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Enums\AchievementPrizeUserStatusEnum;
+use App\Http\Enums\PrizeStatusEnum;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('achievement_id');
             $table->unsignedBigInteger('prize_id');
             $table->unsignedBigInteger('user_id');
-            $table->integer('status')->default(AchievementPrizeUserStatusEnum::PENDING->value);
+            $table->integer('status')->default(PrizeStatusEnum::PENDING->value);
             $table->text('comment')->nullable();
             $table->timestamps();
 

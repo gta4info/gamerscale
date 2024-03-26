@@ -2,7 +2,7 @@
     <v-app>
         <v-container class="container">
             <header class="header">
-                <a href="/" class="header__logo">
+                <a href="/profile" class="header__logo">
                     <img src="/img/logo.svg" alt="GamerScale">
                 </a>
 <!--                <ul class="header__nav">-->
@@ -70,6 +70,8 @@ export default {
             {url: '/profile', title: 'Профиль', is_personal: false},
             {url: '/achievements', title: 'Ачивки', is_personal: true},
             {url: '/leaderboard', title: 'Лидерборд', is_personal: true},
+            {url: '/quests', title: 'Квесты', is_personal: true},
+            {url: '/tournaments', title: 'Турниры', is_personal: true},
         ],
         profileUser: {
             id: null,

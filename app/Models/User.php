@@ -7,6 +7,7 @@ use App\Http\Controllers\UserBalanceController;
 use App\Http\Enums\UserBalanceTypeEnum;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -67,11 +68,6 @@ class User extends Authenticatable
         return $this->hasMany(AchievementToUser::class);
     }
 
-    public function achievementPrizes(): HasMany
-    {
-        return $this->hasMany(AchievementPrizeToUser::class);
-    }
-
     public function isAdmin(): bool
     {
         return $this->attributes['is_admin'];
@@ -89,5 +85,10 @@ class User extends Authenticatable
         }
 
         return $arr;
+    }
+
+    public function prizes(): HasMany
+    {
+        return $this->hasMany(PrizeUser::class);
     }
 }

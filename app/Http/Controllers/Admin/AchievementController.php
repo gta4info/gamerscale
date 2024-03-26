@@ -24,7 +24,7 @@ class AchievementController extends Controller
     public function list(): Response
     {
         return Inertia::render('Admin/Achievements/List', [
-            'achievements' => Achievement::all(),
+            'achievements' => Achievement::orderByDesc('id')->get(),
             'available_types' => $this->getTypes()
         ]);
     }
